@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mario - Platforme Ieșire Apă & Double Jump</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+    #game-container {
+      position: relative;
+      width: 900px;
+      height: 520px;
+      max-width: 98vw;
+      max-height: 98vh;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      border: 4px solid #fff;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      background-color: #5c94fc;
+      display: block;
+    }
+
+    /* ECRAN SELECȚIE */
+    #selection-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(26, 26, 46, 0.96);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      padding: 20px;
+    }
+    #selection-screen h2 {
+      color: #fff;
+      font-size: 30px;
+      text-shadow: 2px 2px #000;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .name-input-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .name-input-group label {
+      color: #f1c40f;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .name-input-group input {
+      padding: 10px 15px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 2px solid #f1c40f;
+      outline: none;
+      text-align: center;
+      font-weight: bold;
+      width: 250px;
+      transition: border-color 0.2s;
+    }
+    .name-input-group input.error {
+      border-color: #e74c3c !important;
+      box-shadow: 0 0 10px #e74c3c;
+    }
+
+    #name-error {
+      color: #e74c3c;
+      font-size: 14px;
+      font-weight: bold;
+      height: 18px;
+      margin-bottom: 10px;
+    }
+
+    .character-list {
+      display: flex;
+      gap: 25px;
+      justify-content: center;
+    }
+    .char-card {
+      background: #fff;
+      border: 4px solid #f1c40f;
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s;
+      width: 160px;
+    }
+    .char-card:hover {
+      transform: translateY(-8px) scale(1.05);
+      background-color: #f9f9f9;
+    }
+    .char-card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #333;
+    }
+    .char-card p {
+      margin: 10px 0 0 0;
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* ECRAN FINAL */
+    #end-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.92);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 20px;
+    }
+    #end-title {
+      font-size: 38px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-shadow: 2px 2px #000;
+      text-align: center;
+    }
+    #end-subtitle {
+      font-size: 18px;
+      color: #FFD700;
+      margin-bottom: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .leaderboard-box {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid #f1c40f;
+      border-radius: 10px;
+      padding: 12px 20px;
+      width: 80%;
+      max-width: 480px;
+      margin-bottom: 15px;
+    }
+    .leaderboard-box h3 {
+      color: #f1c40f;
+      margin: 0 0 10px 0;
+      text-align: center;
+      font-size: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #fff;
+      font-size: 15px;
+    }
+    .leaderboard-table th, .leaderboard-table td {
+      padding: 6px 10px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .leaderboard-table th {
+      color: #aaa;
+      font-size: 13px;
+    }
+
+    .space-hint {
+      color: #aaa;
+      font-size: 15px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .restart-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: 3px solid #fff;
+      padding: 10px 25px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+    .restart-btn:hover {
+      background-color: #c0392b;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-container">
+  <!-- ECRAN SELECȚIE -->
+  <div id="selection-screen">
+    <h2>Alege Personajul!</h2>
+    <div class="name-input-group">
+      <label for="playerName">Introdu numele tău:</label>
+      <input type="text" id="playerName" placeholder="Scrie numele aici..." maxlength="12">
+    </div>
+    <div id="name-error"></div>
+    <div class="character-list">
+      <div class="char-card" onclick="selectCharacter(0)">
+        <img src="Misu.jpg" alt="Misu" onerror="this.src='https://via.placeholder.com/120/FF0000/FFFFFF?text=Misu'">
+        <p>Misu</p>
+      </div>
+      <div class="char-card" onclick="selectCharacter(1)">
+        <img src="Bobita.jpg" alt="Bobita" onerror="this.src='https://via.placeholder.com/120/00FF00/FFFFFF?text=Bobita'">
+        <p>Bobita</p>
+      </div>
+      <div class="char-card" onclick="selectCharacter(2)">
+        <img src="Edi.jpg" alt="Edi" onerror="this.src='https://via.placeholder.com/120/0000FF/FFFFFF?text=Edi'">
+        <p>Edi</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ECRAN FINAL -->
+  <div id="end-screen">
+    <div id="end-title"></div>
+    <div id="end-subtitle"></div>
+
+    <div class="leaderboard-box">
+      <h3>🏆 TOP JUCĂTORI (PERSISTENT) 🏆</h3>
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nume</th>
+            <th>Timp</th>
+            <th>Puncte</th>
+            <th>Scor Final</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+    </div>
+
+    <button class="restart-btn" onclick="location.reload()">Joacă din nou 🔄</button>
+    <div class="space-hint">Sau apasă SPACE pentru a reîncepe</div>
+  </div>
+
+  <canvas id="gameCanvas" width="900" height="520"></canvas>
+</div>
+
+<script>
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  const selectionScreen = document.getElementById("selection-screen");
+  const endScreen = document.getElementById("end-screen");
+  const endTitle = document.getElementById("end-title");
+  const endSubtitle = document.getElementById("end-subtitle");
+  const nameInput = document.getElementById("playerName");
+  const nameError = document.getElementById("name-error");
+  const leaderboardBody = document.getElementById("leaderboard-body");
+
+  const LEVEL_WIDTH = 8500;
+  const WATER_START = 2200;
+  const WATER_END = 3600;
+  const WATER_TOP_Y = 320;
+
+  const characters = [
+    { name: "Misu", src: "Misu.jpg" },
+    { name: "Bobita", src: "Bobita.jpg" },
+    { name: "Edi", src: "Edi.jpg" }
+  ];
+
+  let selectedCharIndex = 0;
+  let playerName = "";
+  let playerHeadImg = new Image();
+  let enemyImg = new Image();
+  enemyImg.src = "inamic.jpg";
+
+  let gameStarted = false;
+  let cameraX = 0;
+  let frameCount = 0;
+  let superTextTimer = 0;
+  let teleportTextTimer = 0;
+  let gameState = "PLAYING";
+
+  let startTime = 0;
+  let totalTimeSeconds = 0;
+
+  nameInput.addEventListener("input", () => {
+    if (nameInput.value.trim() !== "") {
+      nameInput.classList.remove("error");
+      nameError.innerText = "";
+    }
+  });
+
+  function selectCharacter(index) {
+    const enteredName = nameInput.value.trim();
+
+    if (!enteredName) {
+      nameInput.classList.add("error");
+      nameError.innerText = "⚠️ Trebuie să îți scrii numele înainte de a alege un personaj!";
+      nameInput.focus();
+      return;
+    }
+
+    playerName = enteredName;
+    selectedCharIndex = index;
+    playerHeadImg.src = characters[index].src;
+    selectionScreen.style.display = "none";
+    gameStarted = true;
+    startTime = Date.now();
+    loop();
+  }
+
+  const keys = { right: false, left: false, up: false };
+
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
+      if (gameState === "GAMEOVER" || gameState === "WIN") {
+        location.reload();
+        return;
+      }
+      
+      if (!keys.up) {
+        player.jump();
+      }
+      keys.up = true;
+    }
+    if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = true;
+    if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = true;
+  });
+
+  window.addEventListener("keyup", (e) => {
+    if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = false;
+    if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = false;
+    if (e.code === "ArrowUp" || e.code === "Space" || e.code === "KeyW") keys.up = false;
+  });
+
+  const player = {
+    x: 50,
+    y: 200,
+    width: 40,
+    height: 65,
+    vx: 0,
+    vy: 0,
+    speed: 5.5,
+    jumpStrength: -12.5,
+    gravity: 0.6,
+    grounded: false,
+    inWater: false,
+    score: 0,
+    isSuper: false,
+    animStep: 0,
+    jumpsLeft: 2,
+
+    jump() {
+      if (this.inWater) {
+        this.vy = -4.2;
+      } else if (this.grounded || this.jumpsLeft > 0) {
+        this.vy = this.jumpStrength;
+        this.jumpsLeft--;
+        this.grounded = false;
+      }
+    },
+
+    makeSuper() {
+      if (!this.isSuper) {
+        this.isSuper = true;
+        this.width = 70;
+        this.height = 100;
+        this.y -= 35;
+        this.jumpStrength = -15;
+        superTextTimer = 120;
+      }
+    },
+
+    draw() {
+      const px = this.x - cameraX;
+      const py = this.y;
+
+      if (this.vx !== 0 && (this.grounded || this.inWater)) {
+        this.animStep += 0.2;
+      } else {
+        this.animStep = 0;
+      }
+      const legSwing = Math.sin(this.animStep) * (this.isSuper ? 10 : 8);
+
+      if (this.isSuper) {
+        const headSize = 58; 
+        const centerX = px + this.width / 2;
+
+        ctx.fillStyle = "#e74c3c";
+        ctx.strokeStyle = "#c0392b";
+        ctx.lineWidth = 3;
+
+        ctx.beginPath(); ctx.arc(centerX - 28, py + 48, 16, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(centerX + 28, py + 48, 16, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(centerX - 30 - legSwing / 2, py + 58, 8, 0, Math.PI * 2);
+        ctx.arc(centerX + 30 + legSwing / 2, py + 58, 8, 0, Math.PI * 2);
+        ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = "#2980b9";
+        ctx.fillRect(centerX - 20 - legSwing, py + 72, 14, 18);
+        ctx.fillRect(centerX + 6 + legSwing, py + 72, 14, 18);
+
+        ctx.fillStyle = "#5d4037";
+        ctx.fillRect(centerX - 24 - legSwing, py + 86, 18, 14);
+        ctx.fillRect(centerX + 6 + legSwing, py + 86, 18, 14);
+
+        ctx.fillStyle = "#e74c3c";
+        ctx.beginPath();
+        ctx.moveTo(centerX - 26, py + 34);
+        ctx.lineTo(centerX + 26, py + 34);
+        ctx.lineTo(centerX + 18, py + 62);
+        ctx.lineTo(centerX - 18, py + 62);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = "#2980b9";
+        ctx.fillRect(centerX - 16, py + 52, 32, 22);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(centerX, py + 20, headSize / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
+        if (playerHeadImg.complete && playerHeadImg.naturalWidth !== 0) {
+          ctx.drawImage(playerHeadImg, centerX - headSize / 2, py - 9, headSize, headSize);
+        } else {
+          ctx.fillStyle = "#f39c12";
+          ctx.fill();
+        }
+        ctx.restore();
+
+        ctx.strokeStyle = "#222";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(centerX, py + 20, headSize / 2, 0, Math.PI * 2);
+        ctx.stroke();
+
+      } else {
+        const headSize = 46;
+
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(px + 4 - legSwing / 2, py + 42, 5, 0, Math.PI * 2);
+        ctx.arc(px + this.width - 4 + legSwing / 2, py + 42, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#2980b9";
+        ctx.fillRect(px + 6 - legSwing, py + 46, 10, 12);
+        ctx.fillStyle = "#5d4037";
+        ctx.fillRect(px + 3 - legSwing, py + 56, 13, 8);
+
+        ctx.fillStyle = "#2980b9";
+        ctx.fillRect(px + this.width - 16 + legSwing, py + 46, 10, 12);
+        ctx.fillStyle = "#5d4037";
+        ctx.fillRect(px + this.width - 16 + legSwing, py + 56, 13, 8);
+
+        ctx.fillStyle = "#e74c3c";
+        ctx.fillRect(px + 4, py + 26, this.width - 8, 20);
+
+        ctx.fillStyle = "#2980b9";
+        ctx.fillRect(px + 6, py + 36, this.width - 12, 12);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(px + this.width / 2, py + 16, headSize / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
+        if (playerHeadImg.complete && playerHeadImg.naturalWidth !== 0) {
+          ctx.drawImage(playerHeadImg, px + (this.width - headSize) / 2, py - 7, headSize, headSize);
+        } else {
+          ctx.fillStyle = "#f39c12";
+          ctx.fill();
+        }
+        ctx.restore();
+
+        ctx.strokeStyle = "#222";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(px + this.width / 2, py + 16, headSize / 2, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    },
+
+    update(platforms) {
+      this.inWater = (this.x >= WATER_START && this.x <= WATER_END && (this.y + this.height > WATER_TOP_Y));
+
+      if (keys.right) this.vx = this.inWater ? 3.5 : this.speed;
+      else if (keys.left) this.vx = this.inWater ? -3.5 : -this.speed;
+      else this.vx = 0;
+
+      if (this.inWater) {
+        if (keys.up) {
+          this.vy = -4.2;
+        } else {
+          this.vy += 0.15;
+          if (this.vy > 2.2) this.vy = 2.2;
+        }
+      } else {
+        this.vy += this.gravity;
+      }
+
+      this.x += this.vx;
+      if (this.x < 0) this.x = 0;
+
+      platforms.forEach(p => {
+        if (
+          this.x < p.x + p.w &&
+          this.x + this.width > p.x &&
+          this.y < p.y + p.h &&
+          this.y + this.height > p.y
+        ) {
+          if (this.vx > 0) this.x = p.x - this.width;
+          else if (this.vx < 0) this.x = p.x + p.w;
+        }
+      });
+
+      this.y += this.vy;
+      this.grounded = false;
+
+      platforms.forEach(p => {
+        if (
+          this.x < p.x + p.w &&
+          this.x + this.width > p.x &&
+          this.y < p.y + p.h &&
+          this.y + this.height > p.y
+        ) {
+          if (this.vy > 0) {
+            this.y = p.y - this.height;
+            this.vy = 0;
+            this.grounded = true;
+            this.jumpsLeft = 2;
+          } else if (this.vy < 0) {
+            this.y = p.y + p.h;
+            this.vy = 0;
+          }
+        }
+      });
+
+      cameraX = this.x - 200;
+      if (cameraX < 0) cameraX = 0;
+      if (cameraX > LEVEL_WIDTH - canvas.width) cameraX = LEVEL_WIDTH - canvas.width;
+    }
+  };
+
+  const platforms = [
+    { x: 0, y: 440, w: 500, h: 80 },
+    { x: 200, y: 340, w: 90, h: 22 },
+    { x: 350, y: 250, w: 100, h: 22 },
+    { x: 580, y: 440, w: 400, h: 80 },
+    { x: 650, y: 340, w: 80, h: 22 },
+    { x: 800, y: 250, w: 120, h: 22 },
+    { x: 1060, y: 440, w: 450, h: 80 },
+
+    { x: 1600, y: 220, w: 600, h: 300 },
+
+    // Apa (Nivelul apei este la y: 320)
+    { x: WATER_START, y: 480, w: WATER_END - WATER_START, h: 40 },
+    { x: 2600, y: 400, w: 120, h: 22 },
+    { x: 2900, y: 350, w: 120, h: 22 },
+
+    // PLATFORME IEȘIRE APĂ 🪜💧
+    // Ridicată la y: 310 (este chiar deasupra nivelului apei de la 320)
+    { x: 3400, y: 310, w: 110, h: 22 }, 
+    { x: 3520, y: 230, w: 110, h: 22 },
+
+    { x: WATER_END, y: 220, w: 500, h: 300 },
+
+    // Dupa apa
+    { x: 4100, y: 440, w: 600, h: 80 },
+    { x: 4300, y: 330, w: 120, h: 22 },
+    { x: 4550, y: 250, w: 140, h: 22 },
+
+    { x: 4800, y: 440, w: 500, h: 80 },
+    { x: 5000, y: 320, w: 100, h: 22 },
+    { x: 5200, y: 220, w: 120, h: 22 },
+
+    { x: 5400, y: 440, w: 800, h: 80 },
+    { x: 5600, y: 330, w: 140, h: 22 },
+    { x: 5900, y: 240, w: 140, h: 22 },
+
+    // PERETE/BLOC DE PROTECȚIE ÎNAINTE DE ZONA CU PAIAJENI 🛡️
+    { x: 6150, y: 310, w: 40, h: 130 },
+
+    { x: 6300, y: 440, w: 600, h: 80 },
+
+    // PLATFORMELE REÎNTRODUSE PENTRU CIUPERCĂ / POWER-UP 🍄
+    { x: 6350, y: 330, w: 120, h: 22 },
+    { x: 6500, y: 240, w: 140, h: 22 },
+
+    // Zona de Final
+    { x: 7000, y: 440, w: 1500, h: 80 },
+    { x: 7300, y: 330, w: 150, h: 22 },
+    { x: 7650, y: 250, w: 180, h: 22 }
+  ];
+
+  const coins = [
+    { x: 230, y: 300, collected: false },
+    { x: 380, y: 210, collected: false },
+    { x: 680, y: 300, collected: false },
+    { x: 1270, y: 310, collected: false },
+    { x: 2500, y: 380, collected: false },
+    { x: 2800, y: 360, collected: false },
+    { x: 3200, y: 400, collected: false },
+    { x: 3450, y: 270, collected: false }, // Ajustat pentru noua poziție a platformei
+    { x: 4350, y: 280, collected: false },
+    { x: 4600, y: 200, collected: false },
+    { x: 5050, y: 270, collected: false },
+    { x: 5250, y: 170, collected: false },
+    { x: 5650, y: 280, collected: false },
+    { x: 5950, y: 190, collected: false },
+    { x: 7350, y: 280, collected: false }
+  ];
+
+  const powerUp = { x: 6550, y: 190, w: 40, h: 40, collected: false };
+
+  const enemies = [
+    { x: 300, y: 395, w: 45, h: 45, vx: -1.5, minX: 100, maxX: 450, alive: true, shootTimer: 0, isBoss: false, isFish: false },
+    { x: 720, y: 395, w: 45, h: 45, vx: 1.8, minX: 580, maxX: 950, alive: true, shootTimer: 40, isBoss: false, isFish: false },
+    
+    { x: 2350, y: 380, w: 45, h: 28, vx: -2, minX: 2250, maxX: 2650, alive: true, shootTimer: 999, isBoss: false, isFish: true },
+    { x: 2750, y: 420, w: 45, h: 28, vx: 2.2, minX: 2650, maxX: 3100, alive: true, shootTimer: 999, isBoss: false, isFish: true },
+    { x: 3200, y: 390, w: 45, h: 28, vx: -2.5, minX: 3050, maxX: 3350, alive: true, shootTimer: 999, isBoss: false, isFish: true },
+
+    { x: 4200, y: 395, w: 45, h: 45, vx: 1.5, minX: 4100, maxX: 4400, alive: true, shootTimer: 20, isBoss: false, isFish: false },
+    { x: 4500, y: 395, w: 45, h: 45, vx: -1.8, minX: 4350, maxX: 4680, alive: true, shootTimer: 70, isBoss: false, isFish: false },
+    { x: 4900, y: 395, w: 45, h: 45, vx: -2.0, minX: 4800, maxX: 5200, alive: true, shootTimer: 50, isBoss: false, isFish: false },
+    { x: 5500, y: 395, w: 45, h: 45, vx: 2.2, minX: 5400, maxX: 5800, alive: true, shootTimer: 10, isBoss: false, isFish: false },
+    { x: 6400, y: 395, w: 45, h: 45, vx: -1.8, minX: 6300, maxX: 6800, alive: true, shootTimer: 30, isBoss: false, isFish: false },
+    { x: 7150, y: 395, w: 45, h: 45, vx: 2.0, minX: 7000, maxX: 7400, alive: true, shootTimer: 40, isBoss: false, isFish: false },
+
+    { x: 7700, y: 320, w: 120, h: 120, vx: -1.5, minX: 7200, maxX: 8100, alive: true, shootTimer: 0, isBoss: true, isFish: false }
+  ];
+
+  const fireballs = [];
+  const flag = { x: 8250, y: 290, w: 12, h: 150 };
+
+  function checkCollisions() {
+    coins.forEach(c => {
+      if (!c.collected && Math.hypot(player.x + player.width/2 - c.x, player.y + player.height/2 - c.y) < 35) {
+        c.collected = true;
+        player.score += 10;
+      }
+    });
+
+    if (!powerUp.collected && 
+        player.x < powerUp.x + powerUp.w &&
+        player.x + player.width > powerUp.x &&
+        player.y < powerUp.y + powerUp.h &&
+        player.y + player.height > powerUp.y) {
+      powerUp.collected = true;
+      player.makeSuper();
+      player.score += 200;
+    }
+
+    enemies.forEach(e => {
+      if (!e.alive) return;
+
+      if (
+        player.x < e.x + e.w &&
+        player.x + player.width > e.x &&
+        player.y < e.y + e.h &&
+        player.y + player.height > e.y
+      ) {
+        if (!e.isFish && player.vy > 0 && player.y + player.height - player.vy <= e.y + (e.isBoss ? 40 : 20)) {
+          if (e.isBoss && !player.isSuper) {
+            triggerGameOver();
+          } else {
+            e.alive = false;
+            player.vy = -11;
+            player.score += e.isBoss ? 500 : 50;
+            player.jumpsLeft = 1;
+          }
+        } else {
+          triggerGameOver();
+        }
+      }
+    });
+
+    fireballs.forEach(f => {
+      if (
+        player.x < f.x + f.r &&
+        player.x + player.width > f.x - f.r &&
+        player.y < f.y + f.r &&
+        player.y + player.height > f.y - f.r
+      ) {
+        if (f.isPurple) {
+          player.x = 2800;
+          player.y = -50;
+          player.vy = 8;
+          teleportTextTimer = 120;
+        } else {
+          triggerGameOver();
+        }
+      }
+    });
+
+    if (player.y > canvas.height + 50) triggerGameOver();
+    
+    if (player.x + player.width >= flag.x && gameState === "PLAYING") {
+      gameState = "WIN";
+      totalTimeSeconds = Math.floor((Date.now() - startTime) / 1000);
+      saveScore(playerName, totalTimeSeconds, player.score);
+      showEndOverlay("VICTORIE!", `Bravo <b>${playerName}</b>!<br>Nicu are prima pregătită pentru tine!`, "#2ecc71");
+    }
+  }
+
+  function triggerGameOver() {
+    if (gameState === "GAMEOVER") return;
+    gameState = "GAMEOVER";
+    showEndOverlay("AI PIERDUT FRAIERE", "Inamicii te-au doborât!", "#FF4D4D");
+  }
+
+  function saveScore(name, time, points) {
+    let leaderboard = JSON.parse(localStorage.getItem("mario_leaderboard")) || [];
+    let finalScore = points + Math.max(0, 1000 - time * 5);
+
+    leaderboard.push({ name, time, points, finalScore });
+    leaderboard.sort((a, b) => b.finalScore - a.finalScore);
+    leaderboard = leaderboard.slice(0, 5);
+
+    localStorage.setItem("mario_leaderboard", JSON.stringify(leaderboard));
+    renderLeaderboard(leaderboard);
+  }
+
+  function renderLeaderboard(leaderboard) {
+    leaderboardBody.innerHTML = "";
+    if (leaderboard.length === 0) {
+      leaderboardBody.innerHTML = `<tr><td colspan="5">Niciun scor salvat încă!</td></tr>`;
+      return;
+    }
+    leaderboard.forEach((item, index) => {
+      const row = `<tr>
+        <td>${index + 1}</td>
+        <td><b>${item.name}</b></td>
+        <td>${item.time}s</td>
+        <td>${item.points}</td>
+        <td><b style="color: #2ecc71">${item.finalScore}</b></td>
+      </tr>`;
+      leaderboardBody.innerHTML += row;
+    });
+  }
+
+  function drawMap() {
+    ctx.fillStyle = "#5c94fc";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const waterDrawX = WATER_START - cameraX;
+    const waterDrawW = WATER_END - WATER_START;
+    if (waterDrawX < canvas.width && waterDrawX + waterDrawW > 0) {
+      ctx.fillStyle = "rgba(12, 108, 217, 0.8)";
+      ctx.fillRect(waterDrawX, WATER_TOP_Y, waterDrawW, canvas.height - WATER_TOP_Y);
+
+      ctx.fillStyle = "#00d2ff";
+      ctx.fillRect(waterDrawX, WATER_TOP_Y, waterDrawW, 10);
+    }
+
+    ctx.fillStyle = "#27ae60";
+    ctx.strokeStyle = "#1e8449";
+    ctx.lineWidth = 3;
+
+    platforms.forEach(p => {
+      ctx.fillRect(p.x - cameraX, p.y, p.w, p.h);
+      ctx.strokeRect(p.x - cameraX, p.y, p.w, p.h);
+    });
+
+    coins.forEach(c => {
+      if (!c.collected) {
+        ctx.fillStyle = "#f1c40f";
+        ctx.beginPath();
+        ctx.arc(c.x - cameraX, c.y, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#f39c12";
+        ctx.stroke();
+      }
+    });
+
+    if (!powerUp.collected) {
+      const gx = powerUp.x - cameraX;
+      const gy = powerUp.y;
+
+      ctx.fillStyle = "#e0a96d";
+      ctx.beginPath();
+      ctx.arc(gx + 20, gy + 20, 18, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#ff69b4";
+      ctx.beginPath();
+      ctx.arc(gx + 20, gy + 20, 16, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#5c94fc";
+      ctx.beginPath();
+      ctx.arc(gx + 20, gy + 20, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      const sparkles = [
+        { x: -8, y: -6, color: "#fff" },
+        { x: 7, y: -8, color: "#f1c40f" },
+        { x: -9, y: 7, color: "#00ffff" },
+        { x: 8, y: 7, color: "#2ecc71" }
+      ];
+
+      sparkles.forEach(s => {
+        ctx.fillStyle = s.color;
+        ctx.beginPath();
+        ctx.arc(gx + 20 + s.x, gy + 20 + s.y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(flag.x - cameraX, flag.y, flag.w, flag.h);
+    ctx.fillStyle = "#e74c3c";
+    ctx.beginPath();
+    ctx.moveTo(flag.x + 12 - cameraX, flag.y);
+    ctx.lineTo(flag.x + 45 - cameraX, flag.y + 20);
+    ctx.lineTo(flag.x + 12 - cameraX, flag.y + 40);
+    ctx.fill();
+
+    // UI
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 18px Arial";
+    ctx.fillText(`Jucător: ${playerName} (${characters[selectedCharIndex].name}) ${player.isSuper ? '💪🍩' : ''}`, 20, 30);
+    ctx.fillText(`Scor: ${player.score}`, 20, 55);
+
+    let currentSeconds = Math.floor((Date.now() - startTime) / 1000);
+    ctx.fillText(`Timp: ${currentSeconds}s`, 20, 80);
+
+    if (superTextTimer > 0) {
+      superTextTimer--;
+      ctx.fillStyle = "#ff69b4";
+      ctx.font = "900 24px Arial";
+      ctx.fillText("GOGOASA SCLIPICIOASA! 💪🍩✨", canvas.width / 2 - 180, 70);
+    }
+
+    if (teleportTextTimer > 0) {
+      teleportTextTimer--;
+      ctx.fillStyle = "#9b59b6";
+      ctx.font = "900 26px Arial";
+      ctx.fillText("🌀 BILA MOV TE-A ARUNCAT ÎN APĂ! 🌀", canvas.width / 2 - 220, 110);
+    }
+  }
+
+  function updateAndDrawEnemies() {
+    enemies.forEach(e => {
+      if (!e.alive) return;
+
+      e.x += e.vx;
+      if (e.x < e.minX || e.x + e.w > e.maxX) e.vx *= -1;
+
+      if (!e.isFish) {
+        e.shootTimer++;
+        if (e.isBoss) {
+          if (e.shootTimer > 50) {
+            let rand = Math.random();
+            let isPurpleBall = rand < 0.35;
+            let shootHigh = rand > 0.65;
+
+            fireballs.push({
+              x: e.vx > 0 ? e.x + e.w : e.x,
+              y: shootHigh ? e.y + 10 : e.y + e.h / 2 + 10,
+              vx: e.vx > 0 ? 6.5 : -6.5,
+              vy: shootHigh ? -4.5 : 0,
+              r: isPurpleBall ? 16 : 13,
+              isPurple: isPurpleBall
+            });
+            e.shootTimer = 0;
+          }
+        } else {
+          if (e.shootTimer > 140) {
+            fireballs.push({
+              x: e.vx > 0 ? e.x + e.w : e.x,
+              y: e.y + e.h / 2,
+              vx: e.vx > 0 ? 4 : -4,
+              vy: 0,
+              r: 8,
+              isPurple: false
+            });
+            e.shootTimer = 0;
+          }
+        }
+      }
+
+      const ex = e.x - cameraX;
+      const ey = e.y;
+
+      if (e.isFish) {
+        ctx.fillStyle = "#ff5252";
+        ctx.beginPath();
+        ctx.ellipse(ex + e.w / 2, ey + e.h / 2, e.w / 2, e.h / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#ffb142";
+        ctx.beginPath();
+        if (e.vx > 0) {
+          ctx.moveTo(ex, ey + e.h / 2);
+          ctx.lineTo(ex - 14, ey);
+          ctx.lineTo(ex - 14, ey + e.h);
+        } else {
+          ctx.moveTo(ex + e.w, ey + e.h / 2);
+          ctx.lineTo(ex + e.w + 14, ey);
+          ctx.lineTo(ex + e.w + 14, ey + e.h);
+        }
+        ctx.fill();
+
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        let eyeX = e.vx > 0 ? ex + e.w - 12 : ex + 12;
+        ctx.arc(eyeX, ey + 9, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#000";
+        ctx.beginPath();
+        ctx.arc(eyeX, ey + 9, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else {
+        ctx.strokeStyle = e.isBoss ? "#8e44ad" : "#111";
+        ctx.lineWidth = e.isBoss ? 7 : 3.5;
+
+        for (let i = 0; i < 4; i++) {
+          let legStep = Math.sin(frameCount * 0.2 + i * 1.5) * (e.isBoss ? 12 : 6);
+          let legSpacing = (e.h / 5) * (i + 1);
+
+          ctx.beginPath();
+          ctx.moveTo(ex + 4, ey + legSpacing);
+          ctx.lineTo(ex - (e.isBoss ? 30 : 12) - i * 2, ey - 5 + legStep);
+          ctx.lineTo(ex - (e.isBoss ? 40 : 18), ey + e.h);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(ex + e.w - 4, ey + legSpacing);
+          ctx.lineTo(ex + e.w + (e.isBoss ? 30 : 12) + i * 2, ey - 5 - legStep);
+          ctx.lineTo(ex + e.w + (e.isBoss ? 40 : 18), ey + e.h);
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = e.isBoss ? "#2c3e50" : "#111";
+        ctx.fillRect(ex - 2, ey - 2, e.w + 4, e.h + 4);
+
+        if (enemyImg.complete && enemyImg.naturalWidth !== 0) {
+          ctx.drawImage(enemyImg, ex, ey, e.w, e.h);
+        } else {
+          ctx.fillStyle = "#e74c3c";
+          ctx.fillRect(ex, ey, e.w, e.h);
+        }
+
+        if (e.isBoss) {
+          ctx.fillStyle = "#ff4d4d";
+          ctx.font = "bold 16px Arial";
+          ctx.fillText("FINAL BOSS 🔥", ex + 5, ey - 15);
+        }
+      }
+    });
+  }
+
+  function updateAndDrawFireballs() {
+    for (let i = fireballs.length - 1; i >= 0; i--) {
+      let f = fireballs[i];
+      f.x += f.vx;
+      
+      if (f.vy) {
+        f.y += f.vy;
+        f.vy += 0.15;
+      }
+
+      let hitPlatform = false;
+      platforms.forEach(p => {
+        if (
+          f.x + f.r > p.x &&
+          f.x - f.r < p.x + p.w &&
+          f.y + f.r > p.y &&
+          f.y - f.r < p.y + p.h
+        ) {
+          hitPlatform = true;
+        }
+      });
+
+      if (hitPlatform || f.x < 0 || f.x > LEVEL_WIDTH || f.y > canvas.height) {
+        fireballs.splice(i, 1);
+        continue;
+      }
+
+      ctx.fillStyle = f.isPurple ? "#8e44ad" : "#ff4d4d";
+      ctx.beginPath();
+      ctx.arc(f.x - cameraX, f.y, f.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = f.isPurple ? "#d35400" : "#ffeb3b";
+      ctx.beginPath();
+      ctx.arc(f.x - cameraX, f.y, f.r / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function showEndOverlay(title, subtitle, titleColor) {
+    endTitle.innerText = title;
+    endTitle.style.color = titleColor;
+    endSubtitle.innerHTML = subtitle;
+
+    let leaderboard = JSON.parse(localStorage.getItem("mario_leaderboard")) || [];
+    renderLeaderboard(leaderboard);
+
+    endScreen.style.display = "flex";
+  }
+
+  function loop() {
+    if (!gameStarted || gameState !== "PLAYING") return;
+
+    frameCount++;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    player.update(platforms);
+    checkCollisions();
+
+    drawMap();
+    updateAndDrawEnemies();
+    updateAndDrawFireballs();
+    player.draw();
+
+    requestAnimationFrame(loop);
+  }
+</script>
+
+</body>
+</html>

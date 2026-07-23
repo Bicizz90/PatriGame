@@ -358,8 +358,8 @@
   const player = {
     x: 50,
     y: 200,
-    width: 40,
-    height: 65,
+    width: 50,
+    height: 80,
     vx: 0,
     vy: 0,
     speed: 5.5,
@@ -385,9 +385,9 @@
     makeSuper() {
       if (!this.isSuper) {
         this.isSuper = true;
-        this.width = 70;
-        this.height = 100;
-        this.y -= 35;
+        this.width = 100;  // Mai lată pentru a părea grasă
+        this.height = 120; // Mai înaltă/mare
+        this.y -= 40;
         this.jumpStrength = -15;
         superTextTimer = 120;
       }
@@ -402,108 +402,121 @@
       } else {
         this.animStep = 0;
       }
-      const legSwing = Math.sin(this.animStep) * (this.isSuper ? 10 : 8);
+      const legSwing = Math.sin(this.animStep) * (this.isSuper ? 12 : 8);
 
       if (this.isSuper) {
-        const headSize = 58; 
+        // --- STAREA GRASĂ (DUPĂ GOGOAȘĂ) ---
+        const headSize = 110; // Cap/Imagine Uriașă
         const centerX = px + this.width / 2;
 
-        ctx.fillStyle = "#e74c3c";
-        ctx.strokeStyle = "#c0392b";
-        ctx.lineWidth = 3;
+        // Piciorușe drăguțe sub burtică
+        ctx.fillStyle = "#e84393";
+        ctx.fillRect(centerX - 30 - legSwing, py + 102, 20, 18);
+        ctx.fillRect(centerX + 10 + legSwing, py + 102, 20, 18);
 
-        ctx.beginPath(); ctx.arc(centerX - 28, py + 48, 16, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.arc(centerX + 28, py + 48, 16, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-
-        ctx.fillStyle = "#fff";
+        // Pantofiori roz
+        ctx.fillStyle = "#ff7675";
         ctx.beginPath();
-        ctx.arc(centerX - 30 - legSwing / 2, py + 58, 8, 0, Math.PI * 2);
-        ctx.arc(centerX + 30 + legSwing / 2, py + 58, 8, 0, Math.PI * 2);
-        ctx.fill(); ctx.stroke();
-
-        ctx.fillStyle = "#2980b9";
-        ctx.fillRect(centerX - 20 - legSwing, py + 72, 14, 18);
-        ctx.fillRect(centerX + 6 + legSwing, py + 72, 14, 18);
-
-        ctx.fillStyle = "#5d4037";
-        ctx.fillRect(centerX - 24 - legSwing, py + 86, 18, 14);
-        ctx.fillRect(centerX + 6 + legSwing, py + 86, 18, 14);
-
-        ctx.fillStyle = "#e74c3c";
-        ctx.beginPath();
-        ctx.moveTo(centerX - 26, py + 34);
-        ctx.lineTo(centerX + 26, py + 34);
-        ctx.lineTo(centerX + 18, py + 62);
-        ctx.lineTo(centerX - 18, py + 62);
-        ctx.closePath();
+        ctx.arc(centerX - 20 - legSwing, py + 118, 12, 0, Math.PI * 2);
+        ctx.arc(centerX + 20 + legSwing, py + 118, 12, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = "#2980b9";
-        ctx.fillRect(centerX - 16, py + 52, 32, 22);
+        // Burtică mare rotundă și grasă
+        ctx.fillStyle = "#fd79a8";
+        ctx.beginPath();
+        ctx.arc(centerX, py + 75, 48, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#e84393";
+        ctx.stroke();
 
+        // Rochiță/Sărmăluță peste burtică
+        ctx.fillStyle = "#e84393";
+        ctx.beginPath();
+        ctx.arc(centerX, py + 70, 36, 0, Math.PI);
+        ctx.fill();
+
+        // Mâini micuțe în Părți
+        ctx.fillStyle = "#ff7675";
+        ctx.beginPath();
+        ctx.arc(centerX - 42, py + 65, 12, 0, Math.PI * 2);
+        ctx.arc(centerX + 42, py + 65, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // CAPUL CU IMAGINEA MARE
         ctx.save();
         ctx.beginPath();
-        ctx.arc(centerX, py + 20, headSize / 2, 0, Math.PI * 2);
+        ctx.arc(centerX, py + 22, headSize / 2, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
 
         if (playerHeadImg.complete && playerHeadImg.naturalWidth !== 0) {
-          ctx.drawImage(playerHeadImg, centerX - headSize / 2, py - 9, headSize, headSize);
+          ctx.drawImage(playerHeadImg, centerX - headSize / 2, py + 22 - headSize / 2, headSize, headSize);
         } else {
           ctx.fillStyle = "#f39c12";
           ctx.fill();
         }
         ctx.restore();
 
-        ctx.strokeStyle = "#222";
-        ctx.lineWidth = 2.5;
+        // Contur Cap
+        ctx.strokeStyle = "#d63031";
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(centerX, py + 20, headSize / 2, 0, Math.PI * 2);
+        ctx.arc(centerX, py + 22, headSize / 2, 0, Math.PI * 2);
         ctx.stroke();
 
       } else {
-        const headSize = 46;
+        // --- STAREA NORMALĂ (FATĂ DRĂGUȚĂ) ---
+        const headSize = 75; // Cap/Poză mult mai mare și în stare normală
+        const centerX = px + this.width / 2;
 
-        ctx.fillStyle = "#fff";
+        // Piciorușe
+        ctx.fillStyle = "#fd79a8";
+        ctx.fillRect(centerX - 16 - legSwing, py + 56, 10, 18);
+        ctx.fillRect(centerX + 6 + legSwing, py + 56, 10, 18);
+
+        // Cizmulițe Roz
+        ctx.fillStyle = "#e84393";
+        ctx.fillRect(centerX - 18 - legSwing, py + 70, 13, 10);
+        ctx.fillRect(centerX + 5 + legSwing, py + 70, 13, 10);
+
+        // Rochiță Fată (Violet/Roz)
+        ctx.fillStyle = "#e84393";
         ctx.beginPath();
-        ctx.arc(px + 4 - legSwing / 2, py + 42, 5, 0, Math.PI * 2);
-        ctx.arc(px + this.width - 4 + legSwing / 2, py + 42, 5, 0, Math.PI * 2);
+        ctx.moveTo(centerX - 8, py + 38);
+        ctx.lineTo(centerX + 8, py + 38);
+        ctx.lineTo(centerX + 22, py + 60);
+        ctx.lineTo(centerX - 22, py + 60);
+        ctx.closePath();
         ctx.fill();
 
-        ctx.fillStyle = "#2980b9";
-        ctx.fillRect(px + 6 - legSwing, py + 46, 10, 12);
-        ctx.fillStyle = "#5d4037";
-        ctx.fillRect(px + 3 - legSwing, py + 56, 13, 8);
+        // Mâini drăguțe
+        ctx.fillStyle = "#ffeaa7";
+        ctx.beginPath();
+        ctx.arc(centerX - 16, py + 46, 5, 0, Math.PI * 2);
+        ctx.arc(centerX + 16, py + 46, 5, 0, Math.PI * 2);
+        ctx.fill();
 
-        ctx.fillStyle = "#2980b9";
-        ctx.fillRect(px + this.width - 16 + legSwing, py + 46, 10, 12);
-        ctx.fillStyle = "#5d4037";
-        ctx.fillRect(px + this.width - 16 + legSwing, py + 56, 13, 8);
-
-        ctx.fillStyle = "#e74c3c";
-        ctx.fillRect(px + 4, py + 26, this.width - 8, 20);
-
-        ctx.fillStyle = "#2980b9";
-        ctx.fillRect(px + 6, py + 36, this.width - 12, 12);
-
+        // CAPUL MARE
         ctx.save();
         ctx.beginPath();
-        ctx.arc(px + this.width / 2, py + 16, headSize / 2, 0, Math.PI * 2);
+        ctx.arc(centerX, py + 16, headSize / 2, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
 
         if (playerHeadImg.complete && playerHeadImg.naturalWidth !== 0) {
-          ctx.drawImage(playerHeadImg, px + (this.width - headSize) / 2, py - 7, headSize, headSize);
+          ctx.drawImage(playerHeadImg, centerX - headSize / 2, py + 16 - headSize / 2, headSize, headSize);
         } else {
           ctx.fillStyle = "#f39c12";
           ctx.fill();
         }
         ctx.restore();
 
-        ctx.strokeStyle = "#222";
-        ctx.lineWidth = 2;
+        // Contur Cap
+        ctx.strokeStyle = "#e84393";
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.arc(px + this.width / 2, py + 16, headSize / 2, 0, Math.PI * 2);
+        ctx.arc(centerX, py + 16, headSize / 2, 0, Math.PI * 2);
         ctx.stroke();
       }
     },
@@ -844,7 +857,7 @@
     // UI
     ctx.fillStyle = "#fff";
     ctx.font = "bold 18px Arial";
-    ctx.fillText(`Jucător: ${playerName} (${characters[selectedCharIndex].name}) ${player.isSuper ? '💪🍩' : ''}`, 20, 30);
+    ctx.fillText(`Jucător: ${playerName} (${characters[selectedCharIndex].name}) ${player.isSuper ? '🍩😋' : ''}`, 20, 30);
     ctx.fillText(`Scor: ${player.score}`, 20, 55);
 
     let currentSeconds = Math.floor((Date.now() - startTime) / 1000);
@@ -854,7 +867,7 @@
       superTextTimer--;
       ctx.fillStyle = "#ff69b4";
       ctx.font = "900 24px Arial";
-      ctx.fillText("GOGOASA SCLIPICIOASA! 💪🍩✨", canvas.width / 2 - 180, 70);
+      ctx.fillText("GOGOASA SCLIPICIOASA! 🍩😋✨", canvas.width / 2 - 180, 70);
     }
 
     if (teleportTextTimer > 0) {

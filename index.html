@@ -225,16 +225,16 @@
     <div id="name-error"></div>
     <div class="character-list">
       <div class="char-card" onclick="selectCharacter(0)">
-        <img src="Misu.jpg" alt="Misu" onerror="this.src='https://via.placeholder.com/120/FF0000/FFFFFF?text=Misu'">
-        <p>Misu</p>
+        <img src="Bianca.jpg" alt="Bianca" onerror="this.src='https://via.placeholder.com/120/FF0000/FFFFFF?text=Bianca'">
+        <p>Bianca</p>
       </div>
       <div class="char-card" onclick="selectCharacter(1)">
-        <img src="Bobita.jpg" alt="Bobita" onerror="this.src='https://via.placeholder.com/120/00FF00/FFFFFF?text=Bobita'">
-        <p>Bobita</p>
+        <img src="Daisy.jpg" alt="Daisy" onerror="this.src='https://via.placeholder.com/120/00FF00/FFFFFF?text=Daisy'">
+        <p>Daisy</p>
       </div>
       <div class="char-card" onclick="selectCharacter(2)">
-        <img src="Edi.jpg" alt="Edi" onerror="this.src='https://via.placeholder.com/120/0000FF/FFFFFF?text=Edi'">
-        <p>Edi</p>
+        <img src="Patri.jpg" alt="Patri" onerror="this.src='https://via.placeholder.com/120/0000FF/FFFFFF?text=Patri'">
+        <p>Patri</p>
       </div>
     </div>
   </div>
@@ -284,16 +284,16 @@
   const WATER_TOP_Y = 320;
 
   const characters = [
-    { name: "Misu", src: "Misu.jpg" },
-    { name: "Bobita", src: "Bobita.jpg" },
-    { name: "Edi", src: "Edi.jpg" }
+    { name: "Bianca", src: "Bianca.jpg" },
+    { name: "Daisy", src: "Daisy.jpg" },
+    { name: "Patri", src: "Patri.jpg" }
   ];
 
   let selectedCharIndex = 0;
   let playerName = "";
   let playerHeadImg = new Image();
   let enemyImg = new Image();
-  enemyImg.src = "inamic.jpg";
+  enemyImg.src = "inamic2.jpg";
 
   let gameStarted = false;
   let cameraX = 0;
@@ -585,8 +585,7 @@
     { x: 2600, y: 400, w: 120, h: 22 },
     { x: 2900, y: 350, w: 120, h: 22 },
 
-    // PLATFORME IEȘIRE APĂ 🪜💧
-    // Ridicată la y: 310 (este chiar deasupra nivelului apei de la 320)
+    // PLATFORME IEȘIRE APĂ
     { x: 3400, y: 310, w: 110, h: 22 }, 
     { x: 3520, y: 230, w: 110, h: 22 },
 
@@ -605,12 +604,10 @@
     { x: 5600, y: 330, w: 140, h: 22 },
     { x: 5900, y: 240, w: 140, h: 22 },
 
-    // PERETE/BLOC DE PROTECȚIE ÎNAINTE DE ZONA CU PAIAJENI 🛡️
     { x: 6150, y: 310, w: 40, h: 130 },
 
     { x: 6300, y: 440, w: 600, h: 80 },
 
-    // PLATFORMELE REÎNTRODUSE PENTRU CIUPERCĂ / POWER-UP 🍄
     { x: 6350, y: 330, w: 120, h: 22 },
     { x: 6500, y: 240, w: 140, h: 22 },
 
@@ -628,7 +625,7 @@
     { x: 2500, y: 380, collected: false },
     { x: 2800, y: 360, collected: false },
     { x: 3200, y: 400, collected: false },
-    { x: 3450, y: 270, collected: false }, // Ajustat pentru noua poziție a platformei
+    { x: 3450, y: 270, collected: false },
     { x: 4350, y: 280, collected: false },
     { x: 4600, y: 200, collected: false },
     { x: 5050, y: 270, collected: false },
@@ -727,7 +724,7 @@
       gameState = "WIN";
       totalTimeSeconds = Math.floor((Date.now() - startTime) / 1000);
       saveScore(playerName, totalTimeSeconds, player.score);
-      showEndOverlay("VICTORIE!", `Bravo <b>${playerName}</b>!<br>Nicu are prima pregătită pentru tine!`, "#2ecc71");
+      showEndOverlay("VICTORIE!", "Bravooo ai câștigat nimic", "#2ecc71");
     }
   }
 
